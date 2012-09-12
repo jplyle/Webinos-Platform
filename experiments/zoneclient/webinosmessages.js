@@ -49,3 +49,40 @@ webinosmessages.makeInvokeMsg = function(status, api, svc, method, params, cb) {
          cb(proto);
     });
 }
+
+
+//Not valid - this is sent by the PZH, I think.
+webinosmessages.makeEnrolMsg = function(status, pzhurl, authCode, cb) {
+    webinosmessages.makeMessagePrototype(status, function(proto) {
+        proto.type = "prop",
+        proto.payload = {
+            "status": "enrollPzp",
+            "pzhid" : pzhurl,
+            "authCode" : authCode
+        }
+        cb(proto);
+    });
+}
+
+/*
+
+{ type: 'prop',
+  id: 53,
+  from: 'gung-ho_Pzp/2',
+  to: 'gung-ho_Pzp',
+  resp_to: 'gung-ho_Pzp/2',
+  payload: 
+   { status: 'enrollPzp',
+     authCode: 'zlHW1kFi6fs=',
+     pzhid: 'pzh.webinos.org/JohnLyle/' } }
+
+
+*/
+
+
+
+
+
+
+
+

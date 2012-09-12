@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Webinos personal zone browser: services</title>
+</head>
+<body>
+<h1>Personal Zone Services</h1>
+
+<ul>
+<%
+
+for (var s in services) {
+
+
+
+%>
+
+    <li>
+    <a href="service/<%=s %>"> 
+        <%=services[s].displayName%> 
+    </a> - <%=services[s].api %>
+    </li>
+    
+<% 
+
+}
+
+%>
+</ul>
+
+<h2>Navigation</h2>
+<ul>
+    <li><a href="refresh">Refresh zone service list</a></li>
+</ul>
+
+
+
+</body>
+</html>
+
+

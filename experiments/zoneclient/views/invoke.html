@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Response to API invocation</title>
+</head>
+<body>
+
+<h1>Response from <%=service.displayName%> </h1>
+
+<h2>Service details</h2>
+
+<% /* include service.html */ %>
+
+<iframe width="600" height="500" src="."></iframe>
+
+<h2>Invocation details</h2>
+
+<p>Called method <b> <%=method%> </b> with arguments:
+    <table>
+    <th>Name</th><th>Value</th>
+    <% for(var a in args) {%>
+        <tr><td> <%=a%> </td> <td> <%=args[a]%> </td></tr>
+    <% } %>
+    </table>
+</p>
+
+<hr />
+
+<% if (index != undefined && index !== null) { %>
+<iframe width="600" height="600" src="./response/<%=index%>" ></iframe>
+<% } else { %>
+
+<p> No message ID found, so no responses received </p>
+
+<% } %>
+
+<p><a href=\"../../list\">Back to the list</a></p>"
+
+</body>
+</html>
+
+

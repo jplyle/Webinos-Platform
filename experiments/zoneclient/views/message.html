@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Message</title>
+</head>
+<body>
+
+<input type="button" value="Reload Page" onClick="window.location.reload()" />
+
+<% 
+
+
+for (var i=0; i<messagelist.length; i++) { 
+    var reply = messagelist[i];
+%>
+<h2>Response</h2>
+<h3>Payload</h3>
+<p>
+<pre style="color:blue">
+
+<%=JSON.stringify(reply.payload.result, null, 4)%>
+
+</pre>
+</p>
+
+<h3>In full</h3>
+<p>
+<pre style="">
+
+<%=JSON.stringify(reply, null, 4)%>
+
+</pre>
+</p>
+<hr />
+<%
+}
+%>
+
+
+</body>
+</html>
+
+

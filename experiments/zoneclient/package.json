@@ -1,0 +1,11 @@
+{
+  "name": "webinos-pzp-client",
+  "description": "A client to the webinos PZP",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "3.x",
+    "websocket": "1.x",
+    "ejs":"0.8.x"
+  }
+}

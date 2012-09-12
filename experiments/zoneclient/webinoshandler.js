@@ -133,8 +133,13 @@ function handleRegister(session, msg, main) {
     webinoshandler.status.connectedPZH = 
         webinoshandler.status.connectedPZH.concat(data.connectedPzh);
     webinoshandler.status.connectionId = msg.to;   
-    webinoshandler.status.myPzp = 
-        msg.to.split('/')[0] + "/" + msg.to.split('/')[1];
+
+    msgToSplit = msg.to.split('/');
+    if (msgToSplit.length == 2) {
+        webinoshandler.status.myPzp = msgToSplit[0];
+    } else {
+        webinoshandler.status.myPzp = msgToSplit[0] + "/" + msgToSplit[1];    
+    } 
     
     webinoshandler.prettyStart(function() {
         main();

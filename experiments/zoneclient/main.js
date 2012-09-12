@@ -91,12 +91,32 @@ function handleIntent(req,res,svclist) {
     }
     service = svclist[req.params.service];
     
-    res.render("intent", {
-        "service" : service,
-        "intentname" : intentname
-    });
- 
+    getIntentReply(service, intentname, function(reply) {
+
+        res.render("intent", {
+                "service" : service,
+                "intentname" : intentname,
+                "reply" : reply.payload.result
+            });
+    
+    })
+    
 }
+
+function getIntentReply(service, intentname, cb) {
+
+if (service.api === GEO_API) {
+        
+    invokeAPI(service, "getCurrentPosition", {}, function(reply, orig) {
+        cb(reply);
+    });
+    
+} else {
+    cb("No reply message");
+}
+
+}
+
 
 
 function handleInvokeMultiResponse(req,res,svclist) {

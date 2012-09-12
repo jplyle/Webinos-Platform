@@ -14,7 +14,31 @@
 
   
   function postResult() {
+
+<% if (service.api === "http://www.w3.org/ns/api-perms/geolocation" ) { 
+
+%>
+    var timestamp = <%=reply.timestamp%>;
+    var coords = {
+<%    for (var c in reply.coords) {   %>
+         "<%=c%>" : <%=reply.coords[c]%>,        
+<%    } %>
+        "done" : null
+    }    
+    /*
+    <%=reply%>
+    */
+    
+    var result = { "coords" : coords, "timestamp" : timestamp };
+    
+
+    window.intent.postResult(result);
+
+    alert(result);
+
+<% } else { %>
     window.intent.postResult("Test");
+<% } %>
   }
   
 </script>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Webinos personal zone intent register</title>
+    <link type="text/css" rel="stylesheet" href="/webinos.css" media="all" />    
+    <script src="http://webintents.org/webintents.min.js"></script>    
+    <script type="text/javascript">
+        function doIntent(api) {
+            var intent = new Intent("http://webintents.org/pick", api);
+
+            /* Set up the callback that recieves the data */
+            var onsuccess = function(data) {
+              // Add the new data to the image.
+               alert(data);
+            };
+
+            window.navigator.startActivity(intent, onsuccess);
+        }
+    </script>
+</head>
+<body>
+<h1>Personal Zone Intent Registration Page</h1>
+
+<p>All your personal zone services are now registered on this page as "pick" intents</p>
+
+<%
+for (var s in services) {
+%>
+<intent
+    action="http://webintents.org/pick" 
+    type="<%=services[s].api%>" 
+    href="service/<%=s%>/intent/pick.html"
+/>
+<%
+} 
+%>
+
+<table>
+<th>API name</th><th>Pick</th>
+<%
+
+var apis = [];
+
+for (var s in services) {
+
+if (!(services[s].api in apis)) {
+
+apis.push(services[s].api);
+
+%>
+
+    <tr>
+    <td>
+        <%=services[s].api %>
+    </td>
+    <td>
+        <button onclick="doIntent('<%=services[s].api%>')">Pick</button>
+    </td>
+    </tr>
+<% 
+}
+
+}
+
+%>
+</table>
+
+
+</body>
+</html>
+
+

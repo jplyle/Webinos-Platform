@@ -7,7 +7,8 @@
 <body>
 <h1>Personal Zone Services</h1>
 
-<ul>
+<table>
+<th>Service name</th><th>API</th><th>ID</th>
 <%
 
 for (var s in services) {
@@ -16,18 +17,25 @@ for (var s in services) {
 
 %>
 
-    <li>
-    <a href="/service/<%=s %>"> 
-        <%=services[s].displayName%> 
-    </a> - <%=services[s].api %>
-    </li>
-    
+    <tr>
+    <td>
+        <a href="/service/<%=s %>/"> 
+            <%=services[s].displayName%> 
+        </a>
+    </td>
+    <td>
+        <%=services[s].api %>
+    </td>
+    <td>
+        <%=s%>
+    </td>
+    </tr>
 <% 
 
 }
 
 %>
-</ul>
+</table>
 
 <h2>Navigation</h2>
 <ul>

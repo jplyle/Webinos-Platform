@@ -16,11 +16,8 @@ function main(session) {
     webinosmsgs.makeRegisterMsg(webinoshandler.status, function(msg) {
         webinoshandler.send(msg, null, function() {
             startServer();
-
         });
-        
     }); 
-
 }
 
 function startServer() {
@@ -32,7 +29,8 @@ function startServer() {
     app.engine('.html', require('ejs').__express);
     app.set('views', __dirname + '/views');
     app.set('view engine', 'html');
-    
+
+    app.use(express.static(__dirname + '/public'));
     
     app.get('/', function(req,res) {
         getRoot(req,res)
@@ -140,72 +138,6 @@ function renderInvoke(service, method, args, index, res) {
 }
 
 
-/*
-
-function manageAPIReply(service, method, args, res, reply, orig) {
-
-    displayService(service, function(html) {
-        webinoshandler.findMessageConversationId(reply, 
-                function(err) {  }, 
-                function(index) {
-            var output = "<html><head></head><body>";
-            output = output + "<h1>Response from " + service.displayName + " </h1>"; 
-            output = output + "<hr/>";
-            output = output + "<h2>Service details</h2>";
-            output = output +  html;  
-            output = output + "<hr/>";         
-            output = output + "<h2>Invocation details</h2>";
-            output = output + "<p>Called method <b>" + method + "</b> with arguments: ";
-            output = output + "<ul>";
-            for (var a in args) {
-                output = output + "<li>" + a + " = " + args[a] + "</li>";
-            }
-            output = output + "</ul>";  
-            output = output + "<hr/>";
-            
-            output = output + "<iframe width=\"600\" height=\"600\" src=\"./response/" + index + "\"></iframe>"
-            
-            output = output + "<hr/>";
-            output = output + "<p><a href=\"../../list\">Back to the list</a></p>"        
-            output = output + "</body></html>";
-            res.send(output);
-        });
-    });
-
-}
-*/
-/*
-function renderReceivedMessage(reply, cb) {
-    var output = "";
-    output = output + "<h2>Response</h2>";
-    output = output + "<p>" + "<pre style=\"color:red;\">";
-    output = output + util.inspect(reply.payload.result);
-    output = output + "</pre></p>";
-    output = output + "<p>Full response: <br /><pre>" + util.inspect(reply);
-    output = output + "</pre></p>";
-    cb(output);
-}
-*/
-
-/*
-function renderMultipleReceivedMessages(list, cb) {
-    var output = "<html><head></head><body>";
-    output = output + "<input type=\"button\" " +
-        "value=\"Reload Page\" onClick=\"window.location.reload()\">";
-    for(var i=0; i<list.length; i++) {
-        var reply = list[i];    
-        output = output + "\n<h2>Response</h2>";
-        output = output + "<p>" + "<pre style=\"color:red;\">";
-        output = output + util.inspect(reply.payload.result);
-        output = output + "</pre></p>";
-        output = output + "<p>Full response: <br /><pre>" + util.inspect(reply);
-        output = output + "</pre></p>\n";    
-        output = output + "<hr />\n";
-    }
-    output = output + "</body></html>";
-    cb(output);
-}
-*/
 
 function invokeAPI(service, method, args, cb) {
     //create and send a message.
@@ -227,21 +159,6 @@ function invokeAPI(service, method, args, cb) {
 }
 
 
-/*
-function displayService(service, cb) {
-    var html = "";
-    
-    html = html + "<p>";
-    html = html +   "<b>" + service.displayName + "</b>" + "<br />";
-    html = html +   "API: <a href='" + service.api + "'>" + service.api + "" + "</a><br />";
-    if (service.serviceAddress !== '') {
-        html = html +   "Address: <a href='" + service.serviceAddress + "'>" + service.serviceAddress + "</a>" + "<br />";
-    }
-    html = html +   "Description: " + service.description + "<br />";
-    html = html + "</p>";
-    cb(html);
-}
-*/
 
 function listServices(res, svclist) {
     res.render("list", { services : svclist });

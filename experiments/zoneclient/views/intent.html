@@ -1,0 +1,28 @@
+<html>
+<head>
+<title>Picker intent</title>
+<script src="http://webintents.org/webintents.min.js"></script> 
+</head>
+<body>
+<script>
+  window.addEventListener("load", function() {
+    if (window.intent) {
+      console.log(window.intent.data);
+    }
+  }, false);
+
+
+  
+  function postResult() {
+    window.intent.postResult("Test");
+  }
+  
+</script>
+
+<h1>Intent Service</h1>
+<p>This is the intent service</p>
+
+<button onclick="postResult()">Post result</button>
+
+</body>
+</html>

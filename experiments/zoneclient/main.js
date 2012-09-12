@@ -51,8 +51,16 @@ function startServer() {
        listServices(res, svclist);
     });
     
+    app.get('/intent-register', function(req,res) {
+       listIntents(res, svclist);
+    });
+    
     app.get('/service/:service', function(req, res) {
         getServiceInfo(req,res,svclist);
+    });
+
+    app.get('/service/:service/intent/:intentname', function(req, res) {
+        handleIntent(req,res,svclist);    
     });
 
     app.get('/service/:service/:method', function(req, res) {
@@ -67,6 +75,29 @@ function startServer() {
     console.log("Listening on port 3000");
 
 }
+
+
+function listIntents(res, svclist) {
+    res.render("intent-register", { services : svclist });
+}
+
+
+function handleIntent(req,res,svclist) {
+    var service = req.params.service;
+    var intentname = req.params.intentname;
+    if (!(service in svclist)) {
+        res.send(404, "Sevice " + service + " not found");
+        return;
+    }
+    service = svclist[req.params.service];
+    
+    res.render("intent", {
+        "service" : service,
+        "intentname" : intentname
+    });
+ 
+}
+
 
 function handleInvokeMultiResponse(req,res,svclist) {
     var service = req.params.service;

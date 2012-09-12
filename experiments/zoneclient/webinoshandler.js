@@ -42,6 +42,7 @@ webinoshandler.prettyStart = function(cb) {
 
 /* What do I do if I get a message?  Panic, and call this function */
 webinoshandler.handleMessage = function(session, msg, main) {
+    console.log("Receiving: " + util.inspect(msg) + "\n");
     webinoshandler.status.session = session;
     webinoshandler.status.receivedMessages.count += 1; 
     if (msg.type === 'prop') {
@@ -83,7 +84,7 @@ function addReceivedMessage(msg, orig, index) {
     if (!(index in webinoshandler.status.receivedMessages.byConv)) {
         webinoshandler.status.receivedMessages.byConv[index] = [];
     }
-    console.log("Adding message to conversation " + index);
+//    console.log("Adding message to conversation " + index);
     webinoshandler.status.receivedMessages.byConv[index].push(msg);
 }
 

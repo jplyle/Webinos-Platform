@@ -1,22 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Webinos personal zone browser: services</title>
+    <title>Webinos personal zone browser: service</title>
     <link type="text/css" rel="stylesheet" href="/webinos.css" media="all" />       
-    <script src="http://webintents.org/webintents.min.js"></script> 
-    <script type="text/javascript">
-        function doIntent() {
-            var intent = new Intent("http://webintents.org/pick", "<%=service.api%>");
-
-            /* Set up the callback that recieves the data */
-            var onsuccess = function(data) {
-              // Add the new data to the image.
-               alert(data);
-            };
-
-            window.navigator.startActivity(intent, onsuccess);
-        }
-    </script>
 </head>
 <body>
 <h1><%=service.displayName %></h1>
@@ -33,14 +19,6 @@
 
 <h2>Description</h2>
 <p><%=service.description %></p>
-
-<intent
-    action="http://webintents.org/pick" 
-    type="<%=service.api%>" 
-    href="./intent/pick.html"
-/>
-
-<button onclick="doIntent()">Invoke PICK intent for this API</button>
 
 <p><a href="../../list">Back to the list</a></p>
 

@@ -5,13 +5,36 @@
     <link type="text/css" rel="stylesheet" href="/webinos.css" media="all" />    
     <script src="http://webintents.org/webintents.min.js"></script>    
     <script type="text/javascript">
+        /*
+        function receiveMessage(event)
+        {
+        //  if (event.origin !== "http://example.com:8080")
+        //    return;
+         
+          // event.source 
+          // event.data 
+         
+          alert(event.data);
+         
+          var result = "woo";
+          
+          event.source.postMessage(result,
+                                   event.origin);
+        }
+        */
         function doIntent(api) {
             var intent = new Intent("http://webintents.org/pick", api);
 
             /* Set up the callback that recieves the data */
             var onsuccess = function(data) {
               // Add the new data to the image.
-               alert(data);
+               alert(JSON.stringify(data));
+           
+               //window.addEventListener("message", receiveMessage, false);
+               
+               var uri = data.uri;
+               var popup = window.open(uri + "json/" + "getCurrentPosition?foo=bar");
+               
             };
 
             window.navigator.startActivity(intent, onsuccess);

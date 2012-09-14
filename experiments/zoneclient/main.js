@@ -59,9 +59,16 @@ function startServer() {
         getServiceInfo(req,res,svclist);
     });
 
+
+
     app.get('/service/:service/intent/:intentname', function(req, res) {
         handleIntent(req,res,svclist);    
     });
+    
+    app.get('/service/:service/intent/:intentname/do', function(req, res) {
+        handleIntentDo(req,res,svclist);    
+    });
+        
 
     app.get('/service/:service/json/:method', function(req, res) {
         handleInvokeJSON(req,res,svclist);    
@@ -104,8 +111,25 @@ function handleIntent(req,res,svclist) {
             });
     
     })
+}
+
+
+function handleIntentDo(req,res,svclist) {
+    var service = req.params.service;
+    var intentname = req.params.intentname;
+    if (!(service in svclist)) {
+        res.send(404, "Sevice " + service + " not found");
+        return;
+    }
+    service = svclist[req.params.service];
+    
+    res.render("intent-service", {
+        "service" : service,
+        "intentname" : intentname,
+    });
     
 }
+
 
 function getIntentReply(service, intentname, cb) {
     cb(null);

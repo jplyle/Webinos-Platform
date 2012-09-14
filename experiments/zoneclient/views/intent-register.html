@@ -3,42 +3,84 @@
 <head>
     <title>Webinos personal zone intent register</title>
     <link type="text/css" rel="stylesheet" href="/webinos.css" media="all" />    
-    <script src="http://webintents.org/webintents.min.js"></script>    
+
+    <!--
+    <script src="http://webintents.org/webintents.min.js"></script> 
+    -->
+
+    <script src="./webintents.min.js"></script> 
+
     <script type="text/javascript">
-        /*
-        function receiveMessage(event)
-        {
-        //  if (event.origin !== "http://example.com:8080")
-        //    return;
-         
-          // event.source 
-          // event.data 
-         
-          alert(event.data);
-         
-          var result = "woo";
-          
-          event.source.postMessage(result,
-                                   event.origin);
-        }
-        */
-        function doIntent(api) {
+        var intentPort;
+        
+        var intentUri = {};
+        
+        function doIntent(api,x,y) {
+        
             var intent = new Intent("http://webintents.org/pick", api);
 
             /* Set up the callback that recieves the data */
-            var onsuccess = function(data) {
-              // Add the new data to the image.
-               alert(JSON.stringify(data));
-           
-               //window.addEventListener("message", receiveMessage, false);
-               
-               var uri = data.uri;
-               var popup = window.open(uri + "json/" + "getCurrentPosition?foo=bar");
-               
-            };
+            var onsuccess = function(uri) {
+              
+                channel = new MessageChannel();
+                channel.port1.onmessage = onMyMessage;
+                
+                console.log("Received a URI, loading : " + uri);
+                
+                var iframe = document.createElement('iframe');
+                iframe.style.display = "none";
+                iframe.src = uri
+                document.body.appendChild(iframe);
+                
+                
+                intentUri[api] = { 
+                    "iframe" : iframe, 
+                    "location" : uri,
+                    "port1" : channel.port1,              
+                    "port2" : channel.port2
+                };
 
+                
+
+            };
+            
+            console.log("Starting the intent");
             window.navigator.startActivity(intent, onsuccess);
         }
+        
+        function onMyMessage(event) {
+            console.log("[invoker] : Message received at the intent invoker my port: ");  
+     
+            for (var e in event.data) {
+                console.log("data[" + e + "] = " + event.data[e]);
+            }
+            if (("type" in event.data) && ("api" in event.data) && ("payload" in event.data)) {
+                console.log("[invoker] : Handling message type " + event.data.type);
+                handle(event.data.type, event.data.api, event.data.payload);
+            }
+        }
+        
+        function doPost(uri) {
+            console.log("[invoker] : posting a message to " + intentUri[uri].location + " using postMessage ");
+            intentUri[uri].iframe.contentWindow.postMessage("only a test", intentUri[uri].location, [intentUri[uri].port2]); 
+        }
+        
+        function handle(type, api, payload){                        
+            if (api === "http://www.w3.org/ns/api-perms/geolocation") {
+                if (type === "init") {
+                    intentUri[api].port1.postMessage({
+                        "api" : api,
+                        "type" : type,   
+                        "payload" : {
+                            method : "getCurrentPosition",
+                            args : []
+                        }
+                    });
+                }
+            }        
+        }
+        
+        
     </script>
 </head>
 <body>
@@ -52,14 +94,14 @@ for (var s in services) {
 <intent
     action="http://webintents.org/pick" 
     type="<%=services[s].api%>" 
-    href="service/<%=s%>/intent/pick.html"
+    href="service/<%=s%>/intent/pick"
 />
 <%
 } 
 %>
 
 <table>
-<th>API name</th><th>Pick</th>
+<tr><th>API name</th><th>Pick</th><th>Bind</th></tr>
 <%
 
 var apis = [];
@@ -79,6 +121,9 @@ apis.push(services[s].api);
     <td>
         <button onclick="doIntent('<%=services[s].api%>')">Pick</button>
     </td>
+    <td id="bind-button" >
+        <button onclick="doPost('<%=services[s].api%>')">Bind</button>
+    </td>    
     </tr>
 <% 
 }

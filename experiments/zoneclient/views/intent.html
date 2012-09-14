@@ -1,27 +1,22 @@
 <html>
 <head>
 <title>Picker intent</title>
+<!--
 <script src="http://webintents.org/webintents.min.js"></script> 
+-->
+<script src="../../../webintents.min.js"></script> 
+
 </head>
 <body>
 <script>
-  window.addEventListener("load", function() {
+window.addEventListener("load", function() {
     if (window.intent) {
-      window.intent.postResult({
-           "uri" : "http://localhost:3000/service/<%=service.id%>/"
-      });
+      window.intent.postResult( document.URL + "/do" );
+    } else {
       
     }
-  }, false);
+}, false);
 
-  function postResult() {
-
-    var result = {
-        "uri" : "http://localhost:3000/service/<%=service.id%>/"
-    }   
-   
-    window.intent.postResult(result);
-  }
   
 </script>
 

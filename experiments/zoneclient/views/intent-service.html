@@ -1,0 +1,91 @@
+<html>
+<head>
+<title>Actual service</title>
+    <script type="text/javascript" src="/webinos.js"></script>
+</head>
+<body>
+<script>
+
+var service = null;
+
+
+function receiveMessage(event)
+{
+    console.log("[intent service] : Received a message from " + event.origin);
+    var port = event.ports[0]
+    port.onmessage = handleMessage;    
+    console.log("[intent service] : sending a message back ");
+    port.postMessage({
+        "type" : "init", 
+        "api" : "<%=service.api %>",
+        "payload" : {}
+    });
+}
+
+function handleMessage(event) {
+    console.log("[intent service] : Message received at intent service over new port: " + event.data);
+    
+    if ("type" in event.data && "api" in event.data && "payload" in event.data) {
+        handleRequest(event.data.type, event.data.api, event.data.payload);
+    }
+        
+}   
+
+function on_service_found(foundService, cb) {
+    console.log("Found me: " + foundService);
+    foundService.bindService({onBind: function (boundService) {
+            console.log("Bound service: " + boundService.serviceAddress);
+            service = boundService;
+            cb(service);
+        }
+    });  
+}
+
+function find(cb) {
+    webinos.discovery.findServices(
+        new ServiceType("<%=service.api %>"), 
+        {onFound : function(found) {
+            on_service_found(found, cb);
+        }}, 
+        null, 
+        {serviceID : "<%=service.serviceAddress %>"}
+    );
+}
+ 
+
+function handleRequest(type, api, payload) {
+    console.log("Received request for " + type + ", " + api + ", payload: " + payload);
+    if (service === null) {
+        find(function(service) {
+            invokeRequest(type, api, payload, service);
+        });
+    } else {
+        invokeRequest(type, api, payload, service);
+    }
+}
+
+function invokeRequest(type, api, payload, service) {
+    if ("method" in payload) {
+        console.log("Invoke " + payload.method + "...");
+    
+        //TODO - invoke the API and return results.
+
+        console.log("done");
+    } else {
+        console.log("Not invoking, no method");
+    }
+    
+}
+
+    
+window.addEventListener("message", receiveMessage, false);      
+  
+</script>
+
+<h1>Actual service page</h1>
+<p>This page can receive postMessages</p>
+
+</body>
+</html>
+
+

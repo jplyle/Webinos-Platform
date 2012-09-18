@@ -8,6 +8,8 @@ var PROP = 'prop';
 var REGISTER = 'registeredBrowser';
 var GEO_API = "http://www.w3.org/ns/api-perms/geolocation";
 
+var allowedOrigins = {};
+
 webinosclient.connect('localhost', 8081, function(session, msg) {
     webinoshandler.handleMessage(session, msg, main);
 });
@@ -15,14 +17,20 @@ webinosclient.connect('localhost', 8081, function(session, msg) {
 function main(session) {
     webinosmsgs.makeRegisterMsg(webinoshandler.status, function(msg) {
         webinoshandler.send(msg, null, function() {
-            startServer();
+            populateAllowedOrigins(function(origins) {
+                startServer(origins);         
+            });
         });
     }); 
 }
 
-function startServer() {
+function startServer(origins) {
     var app = express();
     var svclist = [];
+    
+    allowedOrigins = origins;
+
+    console.log("Allowed origins: " + util.inspect(allowedOrigins));
     
     getAllServices(svclist);
     
@@ -59,8 +67,6 @@ function startServer() {
         getServiceInfo(req,res,svclist);
     });
 
-
-
     app.get('/service/:service/intent/:intentname', function(req, res) {
         handleIntent(req,res,svclist);    
     });
@@ -87,6 +93,14 @@ function startServer() {
 
 }
 
+function populateAllowedOrigins(cb) {
+    var origins = {
+        "http://www.w3.org/ns/api-perms/geolocation" : "http://localhost:3000",
+        "http://webinos.org/api/sensors.temperature" : "none",
+        "http://webinos.org/api/test" : "*"
+    }
+    cb(origins);
+}
 
 function listIntents(res, svclist) {
     res.render("intent-register", { services : svclist });
@@ -158,10 +172,15 @@ function handleReplyMessages(req,res,svclist) {
     
     service = svclist[req.params.service];
  
+    var origins = allowedOrigins[service.api];   
+    res.header('Access-Control-Allow-Origin', origins);
+    console.log("Setting Access-control Allow-Origin for " + service.api + " to " + origins);      
+ 
     console.log("Looking for responses to service " + service.displayName + ", with message id: " + msgid);
  
     msgqueue = webinoshandler.status.receivedMessages.byConv[msgid];
     if (msgqueue === undefined || msgqueue === null | msgqueue === []) {
+
         res.send(404, "Message " + msgid + " responses not found");
         return;
     } else {    
@@ -179,6 +198,12 @@ function handleReplyMessages(req,res,svclist) {
 function getServiceInfo(req,res,svclist) {
     console.log(util.inspect(req.params));
     if (req.params.service in svclist) {
+
+        var origins = allowedOrigins[svclist[req.params.service].api];   
+        res.header('Access-Control-Allow-Origin',origins );
+        console.log("Setting Access-control Allow-Origin for " + svclist[req.params.service].api + " to " + origins);      
+        
+        
         res.render("service", { service : svclist[req.params.service] });
     } else {
         res.send(404, "Not found.");
@@ -194,7 +219,11 @@ function handleInvoke(req, res, svclist) {
         res.send(404, "Sevice " + service + " not found");
         return;
     }
-    
+
+    var origins = allowedOrigins[svclist[service].api];   
+    res.header('Access-Control-Allow-Origin', origins );
+    console.log("Setting Access-control Allow-Origin for " + svclist[service].api + " to " + origins);      
+
     service = svclist[req.params.service];
     console.log("You want to call " + service.displayName + "'s method " + method + " with arguments : " + util.inspect(args));
     invokeAPI(service, method, args, function(reply, orig) {;
@@ -216,6 +245,10 @@ function handleInvokeJSON(req, res, svclist) {
         res.send(404, "Sevice " + service + " not found");
         return;
     }
+
+    var origins = allowedOrigins[svclist[service].api];   
+    res.header('Access-Control-Allow-Origin', origins);
+    console.log("Setting Access-control Allow-Origin for " + svclist[service].api + " to " + origins);      
     
     service = svclist[req.params.service];
     console.log("You want to call " + service.displayName + "'s method " + method + " with arguments : " + util.inspect(args));

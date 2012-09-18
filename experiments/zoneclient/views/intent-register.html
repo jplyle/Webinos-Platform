@@ -9,7 +9,7 @@
     -->
 
     <script src="./webintents.min.js"></script> 
-
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     <script type="text/javascript">
         var intentPort;
         
@@ -65,19 +65,45 @@
             intentUri[uri].iframe.contentWindow.postMessage("only a test", intentUri[uri].location, [intentUri[uri].port2]); 
         }
         
-        function handle(type, api, payload){                        
+        function doInvoke(api) {
             if (api === "http://www.w3.org/ns/api-perms/geolocation") {
-                if (type === "init") {
-                    intentUri[api].port1.postMessage({
+                intentUri[api].port1.postMessage({
                         "api" : api,
-                        "type" : type,   
+                        "type" : "method",   
                         "payload" : {
                             method : "getCurrentPosition",
                             args : []
                         }
-                    });
+                });
+            }
+        }
+        
+        function handle(type, api, payload){                        
+            if (api === "http://www.w3.org/ns/api-perms/geolocation") {
+                if (type === "init") {
+                    console.log("Ready to invoke");
+                } else if (type == "result") {
+                    geo_success_cb(payload);
                 }
             }        
+        }
+        
+        function geo_success_cb(position) {
+            var image_url = "http://maps.google.com/maps/api/staticmap?sensor=false&center=" + position.coords.latitude + "," +
+		                    position.coords.longitude + "&zoom=14&size=400x400&markers=color:blue|label:S|" +
+		                    position.coords.latitude + ',' + position.coords.longitude;
+            var posdata = "<table>";
+            posdata += "<tr><td>latitude</td><td>" + position.coords.latitude + "</td></tr>";	
+            posdata += "<tr><td>longitude</td><td>" + position.coords.longitude + "</td></tr>";	
+            posdata += "<tr><td>altitude</td><td>" + position.coords.altitude + "</td></tr>";	
+			var d = new Date(position.timestamp); // DOMtimestamp is milliseconds since the start of the Unix Epoch
+            posdata += "<tr><td>timestamp</td><td>" + d.toLocaleString() + "</td></tr>";	
+            posdata += "</table>";	
+			document.getElementById('position').innerHTML = posdata;
+		    jQuery("#map").remove();
+		    jQuery(document.body).append(
+		        jQuery(document.createElement("img")).attr("src", image_url).attr('id','map')
+		    );
         }
         
         
@@ -101,7 +127,7 @@ for (var s in services) {
 %>
 
 <table>
-<tr><th>API name</th><th>Pick</th><th>Bind</th></tr>
+<tr><th>API name</th><th>Pick</th><th>Bind</th><th>Invoke</th></tr>
 <%
 
 var apis = [];
@@ -124,6 +150,10 @@ apis.push(services[s].api);
     <td id="bind-button" >
         <button onclick="doPost('<%=services[s].api%>')">Bind</button>
     </td>    
+    <td id="invoke-button" >
+        <button onclick="doInvoke('<%=services[s].api%>')">Invoke</button>
+    </td>    
+    
     </tr>
 <% 
 }
@@ -132,6 +162,10 @@ apis.push(services[s].api);
 
 %>
 </table>
+
+<div id="position">
+	
+</div>
 
 
 </body>

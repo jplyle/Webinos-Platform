@@ -7,12 +7,12 @@
 <script>
 
 var service = null;
-
+var port = null;
 
 function receiveMessage(event)
 {
     console.log("[intent service] : Received a message from " + event.origin);
-    var port = event.ports[0]
+    port = event.ports[0]
     port.onmessage = handleMessage;    
     console.log("[intent service] : sending a message back ");
     port.postMessage({
@@ -69,13 +69,30 @@ function invokeRequest(type, api, payload, service) {
         console.log("Invoke " + payload.method + "...");
     
         //TODO - invoke the API and return results.
-
+        if ( service.api === "http://www.w3.org/ns/api-perms/geolocation") {
+            service.getCurrentPosition(function(res) {
+                          
+                port.postMessage({
+                    "type" : "result", 
+                    "api" : "<%=service.api %>",
+                    "payload" : res
+                });
+                                   
+            }, geo_error_cb, {});
+        }
         console.log("done");
     } else {
         console.log("Not invoking, no method");
     }
     
 }
+
+function geo_error_cb(evt) {
+    console.log("Geolocation Error : " + evt);
+}
+
+
+
 
     
 window.addEventListener("message", receiveMessage, false);      

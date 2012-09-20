@@ -1,4 +1,6 @@
 var webinosmessages = exports;
+var util = require('util');
+var encoder = require('./encoder.js');
 
 webinosmessages.makeMessagePrototype = function(status, cb) {
     var proto = {
@@ -48,6 +50,25 @@ webinosmessages.makeInvokeMsg = function(status, api, svc, method, params, cb) {
          proto.payload.params = params;
          cb(proto);
     });
+}
+
+webinosmessages.makeInvokeMsg2 = function(status, api, svc, method, params, cb) {
+    webinosmessages.makeInvokeMsg(status, api, svc, method, params, function(proto) {
+         console.log("Adding params : " + util.inspect(params));
+         proto.payload.params = [];
+         for (var p in params) {
+            var pTranslated = getParam(params[p])
+            console.log("Param: " + p + " = " + pTranslated);
+            proto.payload.params.push(pTranslated);
+         }
+         console.log("Adding params list: " + util.inspect(proto.payload.params));         
+         
+         cb(proto);
+    });
+}
+
+function getParam(input) {
+    return encoder.decode(input);
 }
 
 

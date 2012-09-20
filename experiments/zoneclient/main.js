@@ -277,7 +277,7 @@ function renderInvoke(service, method, args, index, res) {
 
 function invokeAPI(service, method, args, cb) {
     //create and send a message.
-    webinosmsgs.makeInvokeMsg(
+    webinosmsgs.makeInvokeMsg2(
         webinoshandler.status, 
         service.api, 
         service.id, 

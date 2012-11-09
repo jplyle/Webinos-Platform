@@ -4,15 +4,15 @@
 <head>
   <meta charset="utf-8"/>
   <title>PZH Dashboard</title>
-  <script src="js/webinosPzh.js" type="text/javascript"></script>
-  <link rel="stylesheet" href="css/layout.css" type="text/css" media="screen" />
+  <script src="/js/webinosPzh.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="/css/layout.css" type="text/css" media="screen" />
   <!--[if lt IE 9]>
   <link rel="stylesheet" href="css/ie.css" type="text/css" media="screen" />
   <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
-  <script src="js/hideshow.js" type="text/javascript"></script>
-  <script type="text/javascript" src="js/jquery.equalHeight.js"></script>
+  <script src="/js/hideshow.js" type="text/javascript"></script>
+  <script type="text/javascript" src="/js/jquery.equalHeight.js"></script>
   <script type="text/javascript">
 
   function DisplayListOfDevices(payload){
@@ -46,15 +46,7 @@
   function connectPzh(){
     var id =  document.getElementById('connectPzhId').value;
     id = id.split("/");
-    id = id[0] + "_" + id[1];
-    webinosPZH.commands.connectPzh(id, function(result){
-      if (result === true) {
-        setArticle("Success", "<p>Pzh in now connected!</p>");
-        webinosPZH.commands.listDevices(DisplayListOfDevices);
-      } else {
-        setArticle("Fail", "<p>Pzh did not connect, reason -  " + result + "</p>" );
-      }
-    });
+    window.location.href = "./connect-friend?externalemail=" + encodeURIComponent(id[1]) + "&externalpzh=" + encodeURIComponent(id[0]) ;
   }
   function pzpRevokeResult(payload){
     setArticle("Device removed from personal zone", "<p>" + payload + " device removed.</p>");
@@ -121,9 +113,9 @@
       if (payload.image){
         text += "<p><h3> <img src =  "+ payload.image+"> </img> </h3></p>";
       }
-      text += "<p><h3> Name    :     "+ payload.name +"</h3></p>";
+      text += "<p><h3> Name    :     "+ payload.displayName +"</h3></p>";
       text += "<p><h3> Country :     "+ payload.country +"</h3></p>";
-      text += "<p><h3> Email   :     "+ payload.email+"</h3></p>";
+      text += "<p><h3> Email   :     "+ payload.emails[0].value+"</h3></p>";
       text += "<p><h3> Connected to: "+ payload.servername+"</h3></p>";
 
       setArticle("About you", text);
@@ -174,8 +166,8 @@
 <body>
   <header id="header">
     <hgroup>
-      <h1 class="site_title"><img src="./images/webinosWithBorder.png">Personal zone admin</h1>
-      <h2 class="section_title">Dashboard</h2><div class="btn_view_site"><a href="#logout" onclick="webinosPZH.commands.logout()">Logout</a></div>
+      <h1 class="site_title"><img src="/images/webinosWithBorder.png">Personal zone admin</h1>
+      <h2 class="section_title">Dashboard</h2><div class="btn_view_site"><a href="/logout">Logout</a></div>
     </hgroup>
   </header> <!-- end of header bar -->
 

@@ -33,7 +33,6 @@ if (typeof exports !== "undefined") {
     var RPCHandler     = rpc.RPCHandler;
     var logging        = webinos.global.require(webinos.global.util.location, "lib/logging.js") || console;
     var authcode       = require("./pzh_authcode");
-    var pzh_pzh        = require("../web/pzh_pzh_certificateExchange");
   } catch (err) {
     console.log("webinos modules missing, please check webinos installation" + err);
     return;
@@ -392,8 +391,11 @@ var Pzh = function () {
     } else if (from === config.metaData.serverName) {
       callback({to: config.metaData.serverName, cmd: 'pzhPzh', payload: "Trying to connect own PZH"})
     } else {
-      pzh_pzh.sendCertificate(from, config.metaData.serverName, config.userPref.ports.provider_webServer, config.userPref.ports.provider,
-        config.cert.internal.master.cert, config.crl,fetchPzh, refreshCert, connectOtherPZH, callback);
+//      pzh_pzh.sendCertificate(from, config.metaData.serverName, config.userPref.ports.provider_webServer, config.userPref.ports.provider,
+//        config.cert.internal.master.cert, config.crl,fetchPzh, refreshCert, connectOtherPZH, callback);
+
+//TODO: Fix adding zone certificate.
+
     }
   };
   /**

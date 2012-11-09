@@ -22,7 +22,7 @@ starter.startWS = function (hostname, config, callback) {
     setHostName(hostname, function (address) {
         loadWebServerCertificates(config, function (status, connParam) {
             logger.log("starting the web server on " + config.userPref.ports.provider_webServer);
-            pzhproviderweb.startWebServer(hostname, address, config.userPref.ports.provider_webServer, connParam, function (status, value) {
+            pzhproviderweb.startWebServer(hostname, address, config.userPref.ports.provider_webServer, connParam, config, function (status, value) {
                 if (status) {
                     logger.log("Personal zone provider web server started");
                     return callback(true);

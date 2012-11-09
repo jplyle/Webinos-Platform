@@ -9,7 +9,8 @@ var express         = require('express'),
     GoogleStrategy  = require('passport-google').Strategy;
 
 var webinos = require("find-dependencies")(__dirname),
-    logger   = webinos.global.require(webinos.global.util.location, "lib/logging.js")(__filename) || logger;
+    logger   = webinos.global.require(webinos.global.util.location, "lib/logging.js")(__filename) || logger,
+    realpzhtls = require('./realpzhtls.js');
 
 var pzhproviderweb      = exports; 
 
@@ -18,31 +19,64 @@ var state = {
 };
 
 
-pzhproviderweb.startWebServer = function(host, address, port, config, cb) {
+pzhproviderweb.startWebServer = function(host, address, port, options, config, cb) {
     "use strict";
     logger.log("Port:    " + port)
     logger.log("Host:    " + host)
     logger.log("Address: " + address)
     logger.log("Config:  " + config)   
-    createServer(port, host, address, config, cb);
+    createServer(port, host, address, options, config, cb);
 }
 
-function createServer(port, host, address, options, next) {
+
+
+function createServer(port, host, address, options, config, next) {
     "use strict";
+    var app, routes, server;
 
     //configure the authentication engine and user binding
     passport = createPassport("https://" + address + ':' + port);
 
-    //configure the express app middleware
-    var app = createApp(options, passport);
-    var routes = setRoutes(app, address, port);
-    
-    //actually start the server
-    var server = https.createServer(options, app).listen(port);
+    //connect to the TLS Server
+    makeTLSServerConnection(config, options, function(status, value) {
+        if (status) {
+            //configure the express app middleware
+            app = createApp(options, passport);
+            routes = setRoutes(app, address, port);
+            //actually start the server
+            server = https.createServer(options, app).listen(port);
+        } else {
+            logger.error("Failed to connect to the PZH Provider's TLS server");
+        }
+    });
+
+
     
     //some very basic logger output and calling the callback.
     handleAppStart(app, server, next);
 }
+
+function makeTLSServerConnection(config, webOptions, cb) { 
+    realpzhtls.init(
+    config, 
+    webOptions, 
+    function(data) {
+        console.log("Received data: " + data);
+    }, 
+    function(status, value) {
+        if (status) {
+            realpzhtls.send("john@doe.com", {foo: "bar"}, {
+                err : function(error) { console.log("Error: " + error); },
+                success : function() { console.log("Sent."); }
+            });
+        }
+        cb(status,value);
+    });
+    
+    
+    
+}
+
 
 function createApp(options, passport) {
     "use strict";
@@ -138,7 +172,7 @@ function setRoutes(app, address, port, state) {
 
 function handleAppStart(app, server, next) {
     "use strict";
-    if (server.address() === null) {
+    if (server === undefined || server.address() === null) {
         var err = "ERROR! Failed to start PZH Provider web interface";
         logger.log(err);
         next(false, err);

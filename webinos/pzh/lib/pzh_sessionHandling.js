@@ -59,6 +59,7 @@ var Pzh = function () {
   this.modules;         // holds startup modules
   var self = this;
 
+
   /**
    * prepares prop message to send between entities in webinos framework
    * @param from

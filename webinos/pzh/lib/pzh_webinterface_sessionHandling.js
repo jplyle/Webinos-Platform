@@ -15,6 +15,8 @@ if (typeof exports !== "undefined") {
     var RPCHandler     = rpc.RPCHandler;
     var logging        = webinos.global.require(webinos.global.util.location, "lib/logging.js") || console;
     var authcode       = require("./pzh_authcode");
+    var pzhapis        = require("./pzh_internal_apis");
+    
   } catch (err) {
     console.log("webinos modules missing, please check webinos installation" + err);
     return;
@@ -51,6 +53,15 @@ var pzhWI = function(pzhs) {
 
     function processMsg(conn, obj) {
         console.log(util.inspect(obj));    
+    }
+
+    function findUserFromEmail(email) {
+        for (var p in pzhs) {
+            if (pzhs[p].getUserDetails().email === email) {
+                return pzhs[p];
+            }
+        }
+        return null;
     }
 
 }

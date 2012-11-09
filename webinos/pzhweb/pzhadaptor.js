@@ -5,7 +5,7 @@ var path            = require('path'),
     
 var webinos = require("find-dependencies")(__dirname),
     logger   = webinos.global.require(webinos.global.util.location, "lib/logging.js")(__filename) || logger,
-    pzhtls  = require('./fakepzhtls.js');    
+    pzhtls  = require('./realpzhtls.js');    
 
 
 var pzhadaptor = exports;

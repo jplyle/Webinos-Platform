@@ -7,6 +7,7 @@ var webinos = require("find-dependencies")(__dirname),
 
 var realpzhtls = exports;
 
+
 var connection;
 
 realpzhtls.init = function(config, webOptions, handler, cb) {
@@ -34,7 +35,11 @@ realpzhtls.init = function(config, webOptions, handler, cb) {
         logger.error(err);
         cb(false, err);
     });
-
+    
+    connection.on("end", function() {
+        cb(false, "Connection ended");   
+    });
+        
 }
 
 realpzhtls.send = function(user, message, callback) {

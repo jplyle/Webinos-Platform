@@ -18,6 +18,7 @@ var state = {
     expectedExternalAuth : [],
 };
 
+var tlsConnectionAttempts = 0;
 
 pzhproviderweb.startWebServer = function(host, address, port, options, config, cb) {
     "use strict";
@@ -45,17 +46,18 @@ function createServer(port, host, address, options, config, next) {
             routes = setRoutes(app, address, port);
             //actually start the server
             server = https.createServer(options, app).listen(port);
+            handleAppStart(app, server, next);
         } else {
             logger.error("Failed to connect to the PZH Provider's TLS server");
+            handleAppStart(app, null, next);
         }
     });
-
-
     
-    //some very basic logger output and calling the callback.
-    handleAppStart(app, server, next);
 }
-
+/* Long lasting connection: this will reconnect after any errors a maximum
+ * of 10 times (ok, more like 8).
+ *
+ */
 function makeTLSServerConnection(config, webOptions, cb) { 
     realpzhtls.init(
     config, 
@@ -65,16 +67,28 @@ function makeTLSServerConnection(config, webOptions, cb) {
     }, 
     function(status, value) {
         if (status) {
-            realpzhtls.send("john@doe.com", {foo: "bar"}, {
+            tlsConnectionAttempts++;
+            realpzhtls.send("NO USER", "WEB SERVER INIT", {
                 err : function(error) { console.log("Error: " + error); },
                 success : function() { console.log("Sent."); }
             });
+            if (tlsConnectionAttempts === 0) {
+                //don't bother with success callbacks if it works.
+                cb(status,value);
+            }
+            tlsConnectionAttempts = 0; //reset            
+        } else {
+            tlsConnectionAttempts++;
+            if (tlsConnectionAttempts < 10){
+                setTimeout( function() {
+                    makeTLSServerConnection(config, webOptions, cb);
+                }, 1000);
+            } else {
+                cb(false, "Failed to reconnect to TLS server");
+            }
         }
-        cb(status,value);
+        
     });
-    
-    
-    
 }
 
 
@@ -172,8 +186,8 @@ function setRoutes(app, address, port, state) {
 
 function handleAppStart(app, server, next) {
     "use strict";
-    if (server === undefined || server.address() === null) {
-        var err = "ERROR! Failed to start PZH Provider web interface";
+    if (server === undefined || server === null || server.address() === null) {
+        var err = "ERROR! Failed to start PZH Provider web interface: " + util.inspect(server);
         logger.log(err);
         next(false, err);
     } else {

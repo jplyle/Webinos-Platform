@@ -12,11 +12,11 @@ var connection;
 
 realpzhtls.init = function(config, webOptions, handler, cb) {
     var tlsServerOptions = {
-        host : config.metaData.serverName,
-        port : config.userPref.ports.provider,
-        key : webOptions.key, //TODO: wont be this key
-        cert: webOptions.cert, //TODO: wont be this cert
-        ca : null, // TODO: Get the TLS server's certificate
+        host  : config.metaData.serverName,
+        port  : config.userPref.ports.provider,
+        key   : webOptions.key,   //TODO: wont be this key
+        cert  : webOptions.cert,  //TODO: wont be this cert
+        ca    : null,             //TODO: Get the TLS server's certificate
         rejectUnauthorised: false //TODO: set to true
     }    
     connection = tls.connect(tlsServerOptions, function() {

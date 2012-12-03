@@ -72,11 +72,12 @@ function makeTLSServerConnection(config, webOptions, cb) {
                 err : function(error) { console.log("Error: " + error); },
                 success : function() { console.log("Sent."); }
             });
-            if (tlsConnectionAttempts === 0) {
-                //don't bother with success callbacks if it works.
+            if (tlsConnectionAttempts === 1) {
+                // don't bother with success callbacks if it works
+                // after the first time.
                 cb(status,value);
             }
-            tlsConnectionAttempts = 0; //reset            
+            tlsConnectionAttempts = 1; //reset            
         } else {
             tlsConnectionAttempts++;
             if (tlsConnectionAttempts < 10){

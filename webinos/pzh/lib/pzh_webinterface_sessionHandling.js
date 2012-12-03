@@ -29,42 +29,97 @@ if (typeof exports !== "undefined") {
  * requests.
  */
 
+
 var pzhWI = function(pzhs) {
 
+    this.helloIsItYouImLookingFor = function(conn, data) {
+      //work out whether the PZH web interface is connecting or not.
+      
+      return true;
+    }
 
     this.handleAuthorization = function(conn) {
-        console.log("handling Web Interface authorisation");
-        console.log("PZHs: " + util.inspect(pzhs));
+      console.log("handling Web Interface authorisation");
+      console.log("PZHs: " + util.inspect(pzhs));
     }
     
     this.handleData = function(conn, data) {
-        console.log("handling Web Interface data");    
-        try {
-          conn.pause();
-          session.common.readJson(this, data, function(obj) {
-            processMsg(conn, obj);
-          });
-        } catch (err) {
-          console.log("exception in processing received message " + err);
-        } finally {
-          conn.resume();
-        }
+      console.log("handling Web Interface data");    
+      try {
+        conn.pause();
+        session.common.readJson(this, data, function(obj) {
+          processMsg(conn, obj);
+        });
+      } catch (err) {
+        console.log("exception in processing received message " + err);
+      } finally {
+        conn.resume();
+      }
     }
 
     function processMsg(conn, obj) {
-        console.log(util.inspect(obj));    
+      if (validWebMsg(obj)) {
+        console.log(util.inspect(obj));            
+      } else {
+        console.log("Error validating messsage from web interface");
+      }
     }
 
     function findUserFromEmail(email) {
-        for (var p in pzhs) {
-            if (pzhs[p].getUserDetails().email === email) {
-                return pzhs[p];
-            }
-        }
-        return null;
+      for (var p in pzhs) {
+          if (pzhs[p].getUserDetails().email === email) {
+              return pzhs[p];
+          }
+      }
+      return null;
     }
+    
+    function validWebMsg(obj) {
+      
+    }
+    
 
 }
+
+/* This is input for the schema checking.
+ *
+ */
+var messageTypes = {
+    "getZoneStatus"         : {},
+    "getUserDetails"        : {},
+    "getCrashLog"           : {},
+    "getInfoLog"            : {},
+    "getPzps"               : {},
+    "addPzp"                : {},
+    "revokePzp"             : {},
+    "listAllServices"       : {},
+    "listUnregServices"     : {},
+    "registerService"       : {},
+    "unregisterService"     : {},
+    "certificates"          : {},
+    "setExpectedExternal"   : {},
+    "requestAddFriend"      : {},
+    "getExpectedExternal"   : {},
+    "approveFriend"         : {},
+    "rejectFriend"          : {}
+}
+
+function validateMessage(obj) {
+  //quick check - TODO: integrate with proper schema checking.
+      var valid = obj.hasOwnProperty("user") && obj.hasOwnProperty("message") && obj.message !== undefined && obj.message !== null;
+      if (!valid) {
+        console.log("No 'user' or 'message' field in message from web interface");
+        return false;
+      }
+      valid = obj.message.hasOwnProperty("type") && obj.message.type !== undefined && obj.message.type !== null && ( messageTypes.hasOwnProperty(obj.message.type));
+      if (!valid) {
+        console.log("No valid type field in message: " + obj.message.type);
+        return false;
+      }
+      
+      return true;
+}
+
 
 
 module.exports = pzhWI;
